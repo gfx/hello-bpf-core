@@ -10,5 +10,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
+    - name: check availability
+      run: |
+        ./bpf-core-availability.sh
     - name: make
-      run: make
+      run: |
+        make
