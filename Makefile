@@ -15,7 +15,6 @@ libbpf:
 	if [ ! -e build/libbpf ] ; then git clone https://github.com/libbpf/libbpf ./build/libbpf ; fi
 	cd build/libbpf/src/ && \
 		$(MAKE) BUILD_STATIC_ONLY=1 OBJDIR=../../libbpf DESTDIR=../.. INCLUDEDIR= LIBDIR= UAPIDIR= install
-
 .PHONY: libbpf
 
 build:
@@ -26,8 +25,10 @@ build:
 	bpftool gen skeleton $@/hello.bpf.o > $@/hello.skel.h
 	clang -g -O2 -Wall -Wextra -I $@ -c main.c -o build/main.o
 	clang -g -O2 -Wall -Wextra $@/main.o -L$@ -lbpf -lelf -lz -o $@/hello
-
 .PHONY: build
+
+test:
+	sudo ./build/hello -t
 
 clean:
 	rm -rf build

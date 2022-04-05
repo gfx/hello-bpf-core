@@ -13,6 +13,9 @@ jobs:
     - name: check availability
       run: |
         ./bpf-core-availability.sh
-    - name: make
+    - name: build
       run: |
         make
+    - name: test
+      run: |
+        make test

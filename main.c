@@ -1,9 +1,12 @@
+#include <stdio.h>
+#include <fcntl.h>
+#include <stdbool.h>
+#include <string.h>
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/resource.h>
 #include <unistd.h>
-#include <stdio.h>
-#include <fcntl.h>
 
 #include <bpf/libbpf.h>
 #include <bpf/bpf.h>
@@ -27,8 +30,10 @@ void read_trace_pipe(void)
 	}
 }
 
-int main(void)
+int main(int argc, char *argv[])
 {
+	bool test_mode = argc >= 2 && strcmp(argv[1], "-t") == 0;
+
 	int err;
 
 	struct rlimit rlim = {
@@ -62,9 +67,12 @@ int main(void)
 	}
 	fprintf(stderr, "BPF programs attached\n");
 
-	read_trace_pipe();
+	if (!test_mode) {
+		read_trace_pipe();
+	}
 
 cleanup:
 	hello_bpf__destroy(obj);
+	fprintf(stderr, "BPF object destroyed\n");
 	return err != 0;
 }
