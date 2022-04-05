@@ -4,7 +4,7 @@ all: install-deps libbpf build
 .PHONY: all
 
 install-deps:
-	sudo apt-get install -y linux-tools-generic clang
+	sudo apt-get update && sudo apt-get install -y linux-tools-generic clang
 .PHONY: install-deps
 
 # If there's libbpf-dev in the apt repository, use it. Otherwise, you can build your own.
