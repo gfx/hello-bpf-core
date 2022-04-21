@@ -4,7 +4,7 @@ all: install-deps libbpf build
 .PHONY: all
 
 install-deps:
-	sudo apt-get update && sudo apt-get install -y \
+	sudo apt-get -q update && sudo apt-get install --no-install-recommends -q -y \
 		libelf-dev \
 		linux-tools-generic \
 		clang
