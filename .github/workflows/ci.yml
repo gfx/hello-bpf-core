@@ -17,6 +17,10 @@ jobs:
     runs-on: ${{ matrix.runner }}
     steps:
     - uses: actions/checkout@v3
+    - name: Set Swap Space
+      uses: pierotofy/set-swap-space@master
+      with:
+        swap-size-gb: 8
     - name: check availability
       run: |
         ./bpf-core-availability.sh
