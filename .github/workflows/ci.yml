@@ -4,18 +4,31 @@ on:
   push:
     branches: [ main ]
   pull_request:
+  workflow_dispatch:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    strategy:
+      matrix:
+        runner:
+          - ubuntu-20.04
+    runs-on: ${{ matrix.runner }}
     steps:
     - uses: actions/checkout@v3
+    - name: Set Swap Space
+      uses: pierotofy/set-swap-space@master
+      with:
+        swap-size-gb: 8
     - name: check availability
       run: |
         ./bpf-core-availability.sh
+    - name: build deps
+      run: |
+        make deps
     - name: build
       run: |
-        make
+        make build
     - name: test
       run: |
         make test

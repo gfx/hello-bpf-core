@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/bin/bash
 set -eux -o pipefail
 
 KERNEL_RELEASE="$(uname -r)"
