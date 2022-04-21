@@ -13,7 +13,6 @@ jobs:
       matrix:
         runner:
           - ubuntu-20.04
-          - ubuntu-18.04
     runs-on: ${{ matrix.runner }}
     steps:
     - uses: actions/checkout@v3
