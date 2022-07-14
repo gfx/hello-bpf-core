@@ -1,7 +1,11 @@
 MAKEFILE_DIR=$(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 CLANG=clang
+CFLAGS=-g3 -O2 -Wall -Wextra
+ARCH := $(shell uname -m | sed 's/x86_64/x86/' | sed 's/aarch64/arm64/' | sed 's/ppc64le/powerpc/' | sed 's/mips.*/mips/')
+CLANG_BPF_SYS_INCLUDES = $(shell $(CLANG) -v -E - </dev/null 2>&1 \
+	| sed -n '/<...> search starts here:/,/End of search list./{ s| \(/.*\)|-idirafter \1|p }')
 
-all: deps build
+all: build
 .PHONY: all
 
 deps: apt-packages libbpf bpftool
@@ -21,22 +25,34 @@ libbpf:
 .PHONY: libbpf
 
 bpftool:
-	if [ ! -e deps/bpftool ] ; then git clone --branch v6.7.0 --recursive --depth 1 https://github.com/libbpf/bpftool ./deps/bpftool ; fi
+	if [ ! -e deps/bpftool ] ; then git clone --branch v6.8.0 --recursive --depth 1 https://github.com/libbpf/bpftool ./deps/bpftool ; fi
 	$(MAKE) -j -C deps/bpftool/src/
 .PHONY: bpftool
 
-build:
-	uname -a
-	mkdir -p $@
-	deps/bpftool/src/bpftool btf dump file /sys/kernel/btf/vmlinux format c > $@/vmlinux.h
-	$(CLANG) -g -O2 -Wall -Wextra -target bpf -D__TARGET_ARCH_x86_64 -I $@ -c hello.bpf.c -o $@/hello.bpf.o
-	deps/bpftool/src/bpftool gen skeleton $@/hello.bpf.o > $@/hello.skel.h
-	$(CLANG) -g -O2 -Wall -Wextra -I $@ -c main.c -o build/main.o
-	$(CLANG) -g -O2 -Wall -Wextra $@/main.o -L$@ -lbpf -lelf -lz -o $@/hello
+build/vmlinux.h:
+	mkdir -p build/
+	deps/bpftool/src/bpftool btf dump file /sys/kernel/btf/vmlinux format c > $@
+
+build: build/tracepoint build/usdt
 .PHONY: build
 
+build/tracepoint: build/vmlinux.h tracepoint.c tracepoint.bpf.c
+	uname -a
+	$(CLANG) $(CFLAGS) -target bpf -D__TARGET_ARCH_$(ARCH) $(CLANG_BPF_SYS_INCLUDES) -I build -c tracepoint.bpf.c -o build/tracepoint.bpf.o
+	deps/bpftool/src/bpftool gen skeleton --debug build/tracepoint.bpf.o > build/tracepoint.skel.h
+	$(CLANG) $(CFLAGS) -I build -c tracepoint.c -o build/tracepoint.o
+	$(CLANG) $(CFLAGS) build/tracepoint.o -L build -lbpf -lelf -lz -o build/tracepoint
+
+build/myusdt: build/vmlinux.h myusdt.c myusdt.bpf.c
+	uname -a
+	$(CLANG) $(CFLAGS) -target bpf -D__TARGET_ARCH_$(ARCH) $(CLANG_BPF_SYS_INCLUDES) -I build -c myusdt.bpf.c -o build/myusdt.bpf.o
+	deps/bpftool/src/bpftool gen skeleton --debug build/myusdt.bpf.o > build/myusdt.skel.h
+	$(CLANG) $(CFLAGS) -Wextra -I build -c myusdt.c -o build/myusdt.o
+	$(CLANG) $(CFLAGS) build/myusdt.o -L build -lbpf -lelf -lz -o build/myusdt
+
+
 test:
-	sudo ./build/hello -t
+	sudo ./build/tracepoint -t
 
 clean:
 	rm -rf build deps

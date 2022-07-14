@@ -1,2 +1,4 @@
 build/
 deps/
+*.skel.h
+vmlinux.h
