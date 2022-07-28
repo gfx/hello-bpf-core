@@ -3,7 +3,8 @@
 #include <bpf/bpf_tracing.h>
 #include <bpf/usdt.bpf.h>
 
-SEC("usdt/libc.so.6:libc:setjmp")
+// FIXME: the filename could be its basename after https://github.com/libbpf/libbpf/pull/535 is applied
+SEC("usdt//usr/lib/x86_64-linux-gnu/libc.so.6:libc:setjmp")
 int handle_libc_setjmp(struct pt_regs *ctx)
 {
 	pid_t pid = bpf_get_current_pid_tgid() >> 32;
