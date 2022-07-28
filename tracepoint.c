@@ -11,7 +11,7 @@
 #include <bpf/libbpf.h>
 #include <bpf/bpf.h>
 
-#include "hello.skel.h"
+#include "tracepoint.skel.h"
 
 void read_trace_pipe(void)
 {
@@ -46,21 +46,21 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	struct hello_bpf *obj = hello_bpf__open();
+	struct tracepoint_bpf *obj = tracepoint_bpf__open();
 	if (!obj) {
 		fprintf(stderr, "failed to open and/or load BPF object\n");
 		return 1;
 	}
 	fprintf(stderr, "BPF object opened\n");
 
-	err = hello_bpf__load(obj);
+	err = tracepoint_bpf__load(obj);
 	if (err) {
 		fprintf(stderr, "failed to load BPF object %d\n", err);
 		goto cleanup;
 	}
 	fprintf(stderr, "BPF object loaded\n");
 
-	err = hello_bpf__attach(obj);
+	err = tracepoint_bpf__attach(obj);
 	if (err) {
 		fprintf(stderr, "failed to attach BPF programs\n");
 		goto cleanup;
@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
 	}
 
 cleanup:
-	hello_bpf__destroy(obj);
+	tracepoint_bpf__destroy(obj);
 	fprintf(stderr, "BPF object destroyed\n");
 	return err != 0;
 }

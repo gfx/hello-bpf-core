@@ -29,14 +29,14 @@ build:
 	uname -a
 	mkdir -p $@
 	deps/bpftool/src/bpftool btf dump file /sys/kernel/btf/vmlinux format c > $@/vmlinux.h
-	$(CLANG) -g -O2 -Wall -Wextra -target bpf -D__TARGET_ARCH_x86_64 -I $@ -c hello.bpf.c -o $@/hello.bpf.o
-	deps/bpftool/src/bpftool gen skeleton $@/hello.bpf.o > $@/hello.skel.h
-	$(CLANG) -g -O2 -Wall -Wextra -I $@ -c main.c -o build/main.o
-	$(CLANG) -g -O2 -Wall -Wextra $@/main.o -L$@ -lbpf -lelf -lz -o $@/hello
+	$(CLANG) -g -O2 -Wall -Wextra -target bpf -D__TARGET_ARCH_x86_64 -I $@ -c tracepoint.bpf.c -o $@/tracepoint.bpf.o
+	deps/bpftool/src/bpftool gen skeleton $@/tracepoint.bpf.o > $@/tracepoint.skel.h
+	$(CLANG) -g -O2 -Wall -Wextra -I $@ -c tracepoint.c -o build/tracepoint.o
+	$(CLANG) -g -O2 -Wall -Wextra $@/tracepoint.o -L$@ -lbpf -lelf -lz -o $@/tracepoint
 .PHONY: build
 
 test:
-	sudo ./build/hello -t
+	sudo ./build/tracepoint -t
 
 clean:
 	rm -rf build deps
