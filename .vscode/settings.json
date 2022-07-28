@@ -4,6 +4,8 @@
         "*.mt": "html",
         "hello.skel.h": "c",
         "bpf_helpers.h": "c",
-        "vmlinux.h": "c"
+        "vmlinux.h": "c",
+        "typeinfo": "cpp",
+        "usdt.bpf.h": "c"
     }
 }
