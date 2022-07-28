@@ -10,3 +10,5 @@ int handle_libc_setjmp(struct pt_regs *ctx)
 	bpf_printk("USDT libc:setjmp is fired in pid=%d\n", (int)pid);
 	return 0;
 }
+
+char LICENSE[] SEC("license") = "Dual MIT/GPL";

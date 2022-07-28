@@ -33,7 +33,7 @@ build/vmlinux.h:
 	mkdir -p build/
 	deps/bpftool/src/bpftool btf dump file /sys/kernel/btf/vmlinux format c > $@
 
-build: build/tracepoint build/usdt
+build: build/tracepoint build/myusdt
 .PHONY: build
 
 build/tracepoint: build/vmlinux.h tracepoint.c tracepoint.bpf.c
