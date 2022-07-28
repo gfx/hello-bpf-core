@@ -38,6 +38,7 @@ build: build/tracepoint build/myusdt
 
 build/tracepoint: build/vmlinux.h tracepoint.c tracepoint.bpf.c
 	uname -a
+	$(CLANG) --version
 	$(CLANG) $(CFLAGS) -target bpf -D__TARGET_ARCH_$(ARCH) $(CLANG_BPF_SYS_INCLUDES) -I build -c tracepoint.bpf.c -o build/tracepoint.bpf.o
 	deps/bpftool/src/bpftool gen skeleton --debug build/tracepoint.bpf.o > build/tracepoint.skel.h
 	$(CLANG) $(CFLAGS) -I build -c tracepoint.c -o build/tracepoint.o
@@ -45,6 +46,7 @@ build/tracepoint: build/vmlinux.h tracepoint.c tracepoint.bpf.c
 
 build/myusdt: build/vmlinux.h myusdt.c myusdt.bpf.c
 	uname -a
+	$(CLANG) --version
 	$(CLANG) $(CFLAGS) -target bpf -D__TARGET_ARCH_$(ARCH) $(CLANG_BPF_SYS_INCLUDES) -I build -c myusdt.bpf.c -o build/myusdt.bpf.o
 	deps/bpftool/src/bpftool gen skeleton --debug build/myusdt.bpf.o > build/myusdt.skel.h
 	$(CLANG) $(CFLAGS) -Wextra -I build -c myusdt.c -o build/myusdt.o
